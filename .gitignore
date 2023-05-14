@@ -1,0 +1,7 @@
+*.log
+__pycache__/
+app/__pycache__
+ozon/
+venv/
+*.db
+config.py
