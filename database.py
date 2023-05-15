@@ -76,6 +76,10 @@ class Database:
                     processed_dttm TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     deleted_flag BLOB DEFAULT false
                 );
+            CREATE VIEW active_products 
+            AS 
+            select distinct id_ozon from products
+            where deleted_flag = false;
             ''')
         connection.commit()
         cursor.close()
@@ -110,6 +114,17 @@ class Database:
                             where id = {user_id}"""
         record = self._execute_query(select_query, select=True)
         return record
+    #Продукты
+    async def check_product(self, product_id: int):
+        select_query = f"""select id_ozon, deleted_flag from products
+                            where id_ozon = {product_id}"""
+        record = self._execute_query(select_query, select=True)
+        return record
+    async def add_product(self, id_ozon: int, name_ozon: str):
+        insert_query = f"""INSERT INTO products (id_ozon, name_ozon)
+                            VALUES ({id_ozon}, "{name_ozon}")"""
+        self._execute_query(insert_query)
+
 
     
 

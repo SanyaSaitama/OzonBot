@@ -194,11 +194,27 @@ async def help_handler(message: types.Message):
 async def unknown_message(message: types.Message):
     if re.search('ozon.ru/',message.text):
     # Проверка ссылки на карточку на товар
-        #await message.answer(msg.ozon_reply, reply_markup=s.MAIN_KB)
-        price = s.OzonParser.get_price_ozon(message.text)
-        await message.answer(msg.ozon_price.format(price=price))
+        await message.answer(msg.ozon_reply)
+        #получение информации по товару
+        ProductInfo = s.OzonParser.get_price_ozon(message.text)
+        if ProductInfo['product_id'] is None:
+            await message.answer(msg.ozon_no_product)
+        else:
+                
+            #сверка ид с каталогом товаров
+            checkproduct = await db.check_product(ProductInfo['product_id'])
+            print(checkproduct)
+            if checkproduct is None:
+                await db.add_product(id_ozon=ProductInfo['product_id'], name_ozon=ProductInfo['product_name'])
+                # await db.add_user(user_id=message.from_user.id,username=message.from_user.username)
+            
+            #Добавление в каталог если нет
+            #добавление в лист пользователя товара
+            #вывод информации о товаре + сообщение что поставлено на мониторинг
+            #await message.answer(msg.ozon_reply, reply_markup=s.MAIN_KB)
+            await message.answer(msg.ozon_price.format(name=ProductInfo['product_name']))
     else:
-    #Если отстутсвует 
+    #Если не ссылка на озон 
         await message.answer(msg.unknown_text, reply_markup=s.MAIN_KB)
 
 

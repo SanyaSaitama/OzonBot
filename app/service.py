@@ -270,6 +270,7 @@ class OzonParser():
             try:
                 block_price = json.loads(soup.find(id=re.compile('^state-webOzonAccountPrice')).get('data-state')) # вытаскивание блока с ценой
                 product_price = block_price['priceText'].split('₽')[0].replace(r"\u2009815\u", "")
+                product_price = re.sub('\D', '', product_price)
             except:
                 product_price = block_pricefull['price']
 
@@ -293,29 +294,12 @@ class OzonParser():
             main_category = None
             tags = []
             product_id = None
-        
-        
-        
-        
-        
-        
-
-        
-        
-        
-
-        print(product_id)
-        print(product_available)
-        print(product_name)
-        print(product_price)
-        print(main_category)
-        print(tags)
-        print('')
-
-        
-        
-
-        return 100
+        return {'product_id':product_id,
+                'product_available':product_available,
+                'product_name':product_name,
+                'product_price':product_price,
+                'main_category':main_category,
+                'tags':tags}
 
 
 
