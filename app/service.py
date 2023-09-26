@@ -248,28 +248,43 @@ class OzonParser():
         dr.get(url)
         x = OzonParser.parse_html(dr)
         dr.quit()
-
-        
-        # y = json.loads(soup)
-        # print(y['priceText'])
-        
-        # product_price = int(ast.literal_eval(soup)['priceText'].split('₽')[0].replace(" ", "")) # вытаскивание самой цены
-        # return product_price
         return x
-    
+    def parse_ozon_prices():
+        from selenium import webdriver #drop
+        import undetected_chromedriver as uc
+        import ast
+        import re
+        #Get ozon product list
+        options = webdriver.ChromeOptions() 
+        options.headless = True
+        dr = uc.Chrome(options=options)
+        
+        products = db.get_active_products()
+        for id in products:
+            url = 'https://www.ozon.ru/product/' + str(id[0])
+            print(url)
+            dr.get(url)
+            result = OzonParser.parse_html(dr)
+            print(result)
+            db.save_price(id[0],result['product_available'],result['product_price'])
+        dr.quit()
+        return result
     def parse_html(html):
         from bs4 import BeautifulSoup
         import re
         import json
 
         soup = BeautifulSoup(html.page_source, 'lxml')
+        print(soup)
         
         try:
             block_pricefull = json.loads(soup.find(id=re.compile('^state-webPrice')).get('data-state')) # вытаскивание блока с описанием
             product_available = block_pricefull['isAvailable']
             try:
                 block_price = json.loads(soup.find(id=re.compile('^state-webOzonAccountPrice')).get('data-state')) # вытаскивание блока с ценой
+                print(block_price)
                 product_price = block_price['priceText'].split('₽')[0].replace(r"\u2009815\u", "")
+                #product_price = product_price.replaceAll(r"\[^>]*\", "")
                 product_price = re.sub('\D', '', product_price)
             except:
                 product_price = block_pricefull['price']
@@ -300,7 +315,7 @@ class OzonParser():
                 'product_price':product_price,
                 'main_category':main_category,
                 'tags':tags}
-
+    
 
 
         

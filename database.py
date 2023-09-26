@@ -100,6 +100,16 @@ class Database:
         else:
             self._conn.commit()
         cursor.close()
+    def _execute_query_select_all(self, query, select=False):
+        cursor = self._conn.cursor()
+        cursor.execute(query)
+        if select:
+            records = cursor.fetchall()
+            cursor.close()
+            return records
+        else:
+            self._conn.commit()
+        cursor.close()
 
     """ Команды """
     #Пользователи
@@ -124,7 +134,15 @@ class Database:
         insert_query = f"""INSERT INTO products (id_ozon, name_ozon)
                             VALUES ({id_ozon}, "{name_ozon}")"""
         self._execute_query(insert_query)
-
+    def qget_active_products(self):
+        select_query = f"""select * from active_products"""
+        record = self._execute_query_select_all(select_query, select=True)
+        return record
+    #Цены
+    def save_price(self,id,available,price):
+        insert_query = f"""INSERT INTO product_prices (id_product, is_avaialble, price)
+                            VALUES ({id}, {available}, {price})"""
+        self._execute_query(insert_query)
 
     
 

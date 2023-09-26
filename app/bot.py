@@ -212,6 +212,7 @@ async def unknown_message(message: types.Message):
             #добавление в лист пользователя товара
             #вывод информации о товаре + сообщение что поставлено на мониторинг
             #await message.answer(msg.ozon_reply, reply_markup=s.MAIN_KB)
+            s.OzonParser.parse_ozon_prices()
             await message.answer(msg.ozon_price.format(name=ProductInfo['product_name']))
     else:
     #Если не ссылка на озон 
